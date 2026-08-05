@@ -1,27 +1,18 @@
-import express from 'express';
-import routes from './routes/routes';
+import express from "express"
+import routes from "./routes/aggregate"
 
-const app = express();
+const app = express()
 
-/**
- * App Configuration
- */
+app.use(routes)
 
-app.use(routes);
+app.use(express.static(__dirname + "/assets"))
 
-// Serves images
-app.use(express.static(__dirname + '/assets'));
+app.get("/", (req: express.Request, res: express.Response) => {
+  res.json({ status: "API is running on /api" })
+})
 
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.json({ status: 'API is running on /api' });
-});
-
-/**
- * Server activation
- */
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
-  console.info(`server up on port ${PORT}`);
+  console.info(`server up on port ${PORT}`)
 });
