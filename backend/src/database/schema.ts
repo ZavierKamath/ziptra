@@ -23,8 +23,10 @@ export const tasks = sqliteTable("tasks", {
 
 export const comments = sqliteTable("comments", {
 	commentId: text("commentId").primaryKey(),
-	parentType: text("parentType").notNull(),
-	parentId: text("parentId").notNull().references(() => projects.projectId, {
+	taskId: text("taskId").references(() => tasks.taskId, {
+		onDelete: "cascade"
+	}),
+	projectId: text("projectId").references(() => projects.projectId, {
 		onDelete: "cascade"
 	}),
 	createdAt: text("createdAt").notNull(),

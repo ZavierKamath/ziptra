@@ -13,8 +13,8 @@ export type Comment = {
 
 export interface CommentRow {
 	commentId: string,
-	parentType: string,
-	parentId: string,
+	taskId: string,
+	projectId: string,
 	createdAt: string,
 	updatedAt: string,
 	content: string
