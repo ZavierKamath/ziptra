@@ -11,11 +11,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "drizzle-orm": "^0.45.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
+    "drizzle-kit": "^0.31.10",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^7.0.2"

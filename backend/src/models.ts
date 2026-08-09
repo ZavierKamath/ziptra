@@ -4,8 +4,8 @@ export type ParentType = "Task" | "Project"
 
 export type Comment = {
 	commentId: string,
-	parentType: ParentType,
-	parentId: string,
+	taskId: string | null,
+	projectId: string | null,
 	createdAt: Date,
 	updatedAt: Date,
 	content: string
@@ -13,8 +13,8 @@ export type Comment = {
 
 export interface CommentRow {
 	commentId: string,
-	taskId: string,
-	projectId: string,
+	taskId: string | null,
+	projectId: string | null,
 	createdAt: string,
 	updatedAt: string,
 	content: string
@@ -22,7 +22,7 @@ export interface CommentRow {
 
 export type Task = {
 	taskId: string,
-	projectId: string,
+	projectId: string | null,
 	title: string,
 	description: string,
 	comments: Comment[],
@@ -33,7 +33,7 @@ export type Task = {
 
 export interface TaskRow {
 	taskId: string,
-	projectId: string,
+	projectId: string | null,
 	title: string,
 	description: string,
 	createdAt: string,
@@ -58,4 +58,45 @@ export interface ProjectRow {
 	createdAt: string,
 	updatedAt: string,
 	status: string
+}
+
+export type CreateProjectInput = {
+	title: string,
+	description?: string,
+	status?: ProjectStatus
+}
+
+export type UpdateProjectInput = {
+	projectId: string,
+	title?: string,
+	description?: string,
+	status?: ProjectStatus
+}
+
+export type CreateTaskInput = {
+	title: string,
+	projectId?: string | null,
+	description?: string,
+	status?: TaskStatus
+}
+
+export type UpdateTaskInput = {
+	taskId: string,
+	title?: string,
+	projectId?: string | null,
+	description?: string,
+	status?: TaskStatus
+}
+
+export type CreateCommentInput = {
+	taskId: string | null,
+	projectId: string | null,
+	content: string
+}
+
+export type UpdateCommentInput = {
+	commentId: string | null,
+	taskId?: string | null,
+	projectId?: string | null,
+	content?: string
 }
