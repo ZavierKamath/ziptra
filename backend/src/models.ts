@@ -24,18 +24,22 @@ export type Task = {
 	taskId: string,
 	projectId: string | null,
 	title: string,
-	description: string,
-	comments: Comment[],
+	description: string | null,
 	createdAt: Date,
 	updatedAt: Date,
 	status: TaskStatus
+}
+
+export type TaskDetails = {
+	project: Task,
+	comments: Comment[],
 }
 
 export interface TaskRow {
 	taskId: string,
 	projectId: string | null,
 	title: string,
-	description: string,
+	description: string | null,
 	createdAt: string,
 	updatedAt: string,
 	status: string
@@ -44,17 +48,22 @@ export interface TaskRow {
 export type Project = {
 	projectId: string,
 	title: string,
-	description: string,
-	comments: Comment[],
+	description: string | null,
 	createdAt: Date,
 	updatedAt: Date,
 	status: ProjectStatus
 }
 
+export type ProjectDetails = {
+	project: Project,
+	comments: Comment[],
+	tasks: Task[]
+}
+
 export interface ProjectRow {
 	projectId: string,
 	title: string,
-	description: string,
+	description: string | null,
 	createdAt: string,
 	updatedAt: string,
 	status: string
