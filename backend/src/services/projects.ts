@@ -8,10 +8,10 @@ import type {
     UpdateProjectInput
 } from "../models.ts"
 import { projects, tasks, comments } from "../database/schema.ts"
-import { db } from "../database/db.ts"
+import { AppDB } from "../database/db.ts"
 import { eq, inArray } from "drizzle-orm"
 
-export function getProjects(): ProjectRow[] {
+export function getProjects(db: AppDB): ProjectRow[] {
 	const foundProjects: ProjectRow[] = db.select()
 		.from(projects)
 		.all()
@@ -19,7 +19,7 @@ export function getProjects(): ProjectRow[] {
 	return foundProjects
 }
 
-export function createProject(input: CreateProjectInput): ProjectRow {
+export function createProject(db: AppDB, input: CreateProjectInput): ProjectRow {
 	const nowString: string = new Date().toISOString()
 
 	const projectRowToInsert: ProjectRow = {
@@ -38,7 +38,7 @@ export function createProject(input: CreateProjectInput): ProjectRow {
 
 	return newProjectRow
 }
-export function updateProject(input: UpdateProjectInput): ProjectRow {
+export function updateProject(db: AppDB, input: UpdateProjectInput): ProjectRow {
 	if (!input.projectId.startsWith("proj_")) {
 		throw new Error(
 			`Error in updateProject: ProjectRow ID does not start with "proj_", it is ${input.projectId}
@@ -74,7 +74,7 @@ export function updateProject(input: UpdateProjectInput): ProjectRow {
 	return updatedProjectRow
 }
 
-export function deleteProject(projectId: string): string {
+export function deleteProject(db: AppDB, projectId: string): string {
 	if (!projectId.startsWith("proj_")) {
 		throw new Error(
 			`Error in deleteProject: projectId does not start with "proj_", it is ${projectId}

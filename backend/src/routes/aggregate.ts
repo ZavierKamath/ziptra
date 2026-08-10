@@ -1,9 +1,12 @@
 import { Router } from "express"
-import tasksController from "./tasks"
-import projectsController from "./projects"
+import createTasksRouter from "./tasks"
+import createProjectsRouter from "./projects"
+import { AppDB } from "../database/db"
 
-const api = Router()
-//  .use(tasksController)
-  .use(projectsController)
+export default function createRoutes(db: AppDB) {
+	const api = Router()
+	//  .use(tasksController)
+		.use(createProjectsRouter(db))
 
-export default Router().use("/api", api)
+	return Router().use("/api", api)
+}

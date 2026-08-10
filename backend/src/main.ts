@@ -1,18 +1,8 @@
-import express from "express"
-import cors from "cors"
-import routes from "./routes/aggregate"
+import { createDb } from "./database/db"
+import { createApp } from "./app"
 
-const app = express()
-
-app.use(cors())
-app.use(express.json())
-app.use(routes)
-
-app.use(express.static(__dirname + "/assets"))
-
-app.get("/", (req: express.Request, res: express.Response) => {
-  res.json({ status: "API is running on /api" })
-})
+const db = createDb("ziptra.db")
+const app = createApp(db)
 
 const PORT = process.env.PORT || 3000
 
