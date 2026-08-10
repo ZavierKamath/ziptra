@@ -35,8 +35,8 @@ export default function createProjectsRouter(db: AppDB) {
 	router.delete("/projects", async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const projectIdToDelete: string = req.body.projectId
-			const project = await deleteProject(db, projectIdToDelete) 
-			res.status(201).json({ project }) 
+			const projectId = await deleteProject(db, projectIdToDelete) 
+			res.status(201).json({ projectId }) 
 		} catch (error) {
 			next(error) 
 		}
