@@ -5,7 +5,7 @@ import { AppDB } from "../database/db"
 
 export default function createRoutes(db: AppDB) {
 	const api = Router()
-	//  .use(tasksController)
+	  .use(createTasksRouter(db))
 		.use(createProjectsRouter(db))
 
 	return Router().use("/api", api)

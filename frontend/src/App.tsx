@@ -8,12 +8,24 @@ import {
 	updateProjectAPI,
 	deleteProjectAPI
 } from "./api/projects.ts"
-import type { CreateProjectInput, UpdateProjectInput } from "../../backend/src/models.ts"
+import {
+	createTaskAPI,
+	getTasksAPI,
+	// updateTaskAPI,
+	// deleteTaskAPI
+} from "./api/tasks.ts"
+import type {
+	CreateProjectInput,
+	UpdateProjectInput,
+	CreateTaskInput,
+	// UpdateTaskInput,
+} from "../../backend/src/models.ts"
 
 function App() {
 
 	useEffect(() => {
 		getProjectsAPI().catch(console.error)
+		getTasksAPI().catch(console.error)
 	}, [])
 
 	function makeTestProject() {
@@ -43,6 +55,17 @@ function App() {
 		deleteProjectAPI(deletionPayload)
 	}
 
+	function makeTestTask() {
+		const testTask: CreateTaskInput = {
+			title: "Test Title",
+			projectId: "proj_7a66f6c1-6f6c-4a17-ba13-b3c5733153be",
+			description: "Test description.",
+			status: "New"
+		}
+
+		createTaskAPI(testTask)
+	}
+
   return (
     <div>
 			<Header />
@@ -66,6 +89,12 @@ function App() {
 					className="cursor-pointer rounded border px-3 py-2"
 				>
 					Delete Project
+				</button>
+				<button
+					onClick={makeTestTask}
+					className="cursor-pointer rounded border px-3 py-2"
+				>
+					Make Task
 				</button>
 			</div>
     </div>

@@ -5,7 +5,7 @@ import type {
 	CommentRow,
 	ProjectStatus,
 	CreateProjectInput,
-    UpdateProjectInput
+	UpdateProjectInput
 } from "../models.ts"
 import { projects, tasks, comments } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
