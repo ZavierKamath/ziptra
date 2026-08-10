@@ -14,7 +14,7 @@ router.get("/projects", async (req: Request, res: Response, next: NextFunction) 
 
 router.post("/projects", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const project = await createProject(req.body.project) 
+    const project = await createProject(req.body) 
     res.status(201).json({ project }) 
   } catch (error) {
     next(error) 
@@ -23,7 +23,7 @@ router.post("/projects", async (req: Request, res: Response, next: NextFunction)
 
 router.put("/projects", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const project = await updateProject(req.body.project.projectId, req.body.project) 
+    const project = await updateProject(req.body) 
     res.status(201).json({ project }) 
   } catch (error) {
     next(error) 
@@ -32,7 +32,8 @@ router.put("/projects", async (req: Request, res: Response, next: NextFunction) 
 
 router.delete("/projects", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const project = await deleteProject(req.body.project.projectId) 
+		const projectIdToDelete: string = req.body.projectId
+    const project = await deleteProject(projectIdToDelete) 
     res.status(201).json({ project }) 
   } catch (error) {
     next(error) 

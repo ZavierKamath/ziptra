@@ -10,7 +10,7 @@ export const projects = sqliteTable("projects", {
 })
 
 export const tasks = sqliteTable("tasks", {
-	taskId: text("tasksId").primaryKey(),
+	taskId: text("taskId").primaryKey(),
 	projectId: text("projectId").references(() => projects.projectId, {
 		onDelete: "set null"
 	}),

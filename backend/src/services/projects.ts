@@ -65,8 +65,9 @@ export function updateProject(input: UpdateProjectInput): ProjectRow {
 		status: input.status || projectRowToUpdate.status
 	}
 
-	const updatedProjectRow: ProjectRow = db.insert(projects)
-		.values(projectRowToInsert)
+	const updatedProjectRow: ProjectRow = db.update(projects)
+		.set(projectRowToInsert)
+		.where(eq(projects.projectId, input.projectId))
 		.returning()
 		.get()
 
@@ -74,7 +75,7 @@ export function updateProject(input: UpdateProjectInput): ProjectRow {
 }
 
 export function deleteProject(projectId: string): string {
-	if (projectId.startsWith("proj_")) {
+	if (!projectId.startsWith("proj_")) {
 		throw new Error(
 			`Error in deleteProject: projectId does not start with "proj_", it is ${projectId}
 		`)
