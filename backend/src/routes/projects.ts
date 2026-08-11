@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express" 
-import { getProjects, createProject, updateProject, deleteProject } from "../services/projects"
+import {
+	getProjects,
+	getProjectDetails,
+	createProject,
+	updateProject,
+	deleteProject
+} from "../services/projects"
 import type { AppDB } from "../database/db"
 
 export default function createProjectsRouter(db: AppDB) {
@@ -8,6 +14,15 @@ export default function createProjectsRouter(db: AppDB) {
 	router.get("/projects", async (_req: Request, res: Response, next: NextFunction) => {
 		try {
 			const projects = getProjects(db) 
+			res.json({ projects }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
+
+	router.get("/projects/:projectId", async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const projects = getProjectDetails(db, req.params.projectId) 
 			res.json({ projects }) 
 		} catch (error) {
 			next(error) 

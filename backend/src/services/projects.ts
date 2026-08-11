@@ -1,12 +1,15 @@
 import type {
+	CommentRow,
 	ProjectRow,
+	TaskRow,
 	ProjectStatus,
 	CreateProjectInput,
-	UpdateProjectInput
+	UpdateProjectInput,
+	ProjectDetails
 } from "../models.ts"
-import { projects } from "../database/schema.ts"
+import { comments, tasks, projects } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
-import { eq } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 
 export function getProjects(db: AppDB): ProjectRow[] {
 	const foundProjects: ProjectRow[] = db.select()
@@ -14,6 +17,47 @@ export function getProjects(db: AppDB): ProjectRow[] {
 		.all()
 
 	return foundProjects
+}
+
+export function getProjectDetails(db: AppDB, projectId: string): ProjectDetails {
+	if (!projectId.startsWith("proj_")) {
+		throw new Error(`projectId must start with proj_ - found ${projectId}`)
+	}
+
+	const projectRow: ProjectRow | undefined = db.select()
+		.from(projects)
+		.where(eq(projects.projectId, projectId))
+		.get()
+
+	if (!projectRow) {
+		throw new Error(`No ProjectRow for projectId: ${projectId}`)
+	}
+
+	const projectTasks: TaskRow[] = db.select()
+		.from(tasks)
+		.where(eq(tasks.projectId, projectId))
+		.all()
+
+	const taskIds: string[] = projectTasks.map(task => task.taskId)
+
+	const taskComments: CommentRow[] = db.select()
+		.from(comments)
+		.where(inArray(comments.taskId, taskIds))
+		.all()
+
+	const projectComments: CommentRow[] = db.select()
+		.from(comments)
+		.where(eq(comments.projectId, projectId))
+		.all()
+
+	const projectDetails: ProjectDetails = {
+		project: projectRow,
+		projectComments: projectComments,
+		tasks: projectTasks,
+		taskComments: taskComments
+	}
+
+	return projectDetails
 }
 
 export function createProject(db: AppDB, input: CreateProjectInput): ProjectRow {

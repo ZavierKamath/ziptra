@@ -31,8 +31,8 @@ export type Task = {
 }
 
 export type TaskDetails = {
-	project: Task,
-	comments: Comment[],
+	task: TaskRow,
+	comments: CommentRow[],
 }
 
 export interface TaskRow {
@@ -55,9 +55,10 @@ export type Project = {
 }
 
 export type ProjectDetails = {
-	project: Project,
-	comments: Comment[],
-	tasks: Task[]
+	project: ProjectRow,
+	projectComments: CommentRow[],
+	tasks: TaskRow[],
+	taskComments: CommentRow[]
 }
 
 export interface ProjectRow {

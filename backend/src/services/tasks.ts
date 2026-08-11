@@ -1,10 +1,12 @@
 import type {
 	TaskRow,
 	TaskStatus,
+	TaskDetails,
+	CommentRow,
 	CreateTaskInput,
 	UpdateTaskInput
 } from "../models.ts"
-import { tasks } from "../database/schema.ts"
+import { comments, tasks } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
 import { eq } from "drizzle-orm"
 
@@ -35,6 +37,33 @@ export function createTask(db: AppDB, input: CreateTaskInput): TaskRow {
 		.get()
 
 	return newTaskRow
+}
+
+export function getTaskDetails(db: AppDB, taskId: string): TaskDetails {
+	if (!taskId.startsWith("task_")) {
+		throw new Error(`taskId must start with task_ - found ${taskId}`)
+	}
+
+	const taskRow: TaskRow | undefined = db.select()
+		.from(tasks)
+		.where(eq(tasks.taskId, taskId))
+		.get()
+
+	if (!taskRow) {
+		throw new Error(`No TaskRow for taskId: ${taskId}`)
+	}
+
+	const taskComments: CommentRow[] = db.select()
+		.from(comments)
+		.where(eq(comments.taskId, taskId))
+		.all()
+
+	const taskDetails: TaskDetails = {
+		task: taskRow,
+		comments: taskComments,
+	}
+
+	return taskDetails
 }
 
 export function updateTask(db: AppDB, input: UpdateTaskInput): TaskRow {

@@ -16,6 +16,9 @@ export function getComments(db: AppDB): CommentRow[] {
 }
 
 export function createComment(db: AppDB, input: CreateCommentInput): CommentRow {
+	if (!input.taskId && !input.projectId) {
+		throw new Error("Cannot create comment with no taskId or projectId")
+	}
 	const nowString: string = new Date().toISOString()
 
 	const commentRowToInsert: CommentRow = {
