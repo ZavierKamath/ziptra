@@ -1,15 +1,12 @@
 import type {
-	Project,
-	ProjectRow,
 	TaskRow,
-	CommentRow,
 	TaskStatus,
 	CreateTaskInput,
 	UpdateTaskInput
 } from "../models.ts"
-import { projects, tasks, comments } from "../database/schema.ts"
+import { tasks } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
-import { eq, inArray } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 
 export function getTasks(db: AppDB): TaskRow[] {
 	const foundTasks: TaskRow[] = db.select()

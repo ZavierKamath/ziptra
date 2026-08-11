@@ -98,13 +98,13 @@ export type UpdateTaskInput = {
 }
 
 export type CreateCommentInput = {
-	taskId: string | null,
-	projectId: string | null,
+	taskId?: string | null,
+	projectId?: string | null,
 	content: string
 }
 
 export type UpdateCommentInput = {
-	commentId: string | null,
+	commentId: string,
 	taskId?: string | null,
 	projectId?: string | null,
 	content?: string

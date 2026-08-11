@@ -5,9 +5,9 @@ import type { AppDB } from "../database/db"
 export default function createProjectsRouter(db: AppDB) {
 	const router = Router() 
 
-	router.get("/projects", async (req: Request, res: Response, next: NextFunction) => {
+	router.get("/projects", async (_req: Request, res: Response, next: NextFunction) => {
 		try {
-			const projects = await getProjects(db) 
+			const projects = getProjects(db) 
 			res.json({ projects }) 
 		} catch (error) {
 			next(error) 
@@ -16,7 +16,7 @@ export default function createProjectsRouter(db: AppDB) {
 
 	router.post("/projects", async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const project = await createProject(db, req.body) 
+			const project = createProject(db, req.body) 
 			res.status(201).json({ project }) 
 		} catch (error) {
 			next(error) 
@@ -25,7 +25,7 @@ export default function createProjectsRouter(db: AppDB) {
 
 	router.put("/projects", async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const project = await updateProject(db, req.body) 
+			const project = updateProject(db, req.body) 
 			res.status(201).json({ project }) 
 		} catch (error) {
 			next(error) 
@@ -35,7 +35,7 @@ export default function createProjectsRouter(db: AppDB) {
 	router.delete("/projects", async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const projectIdToDelete: string = req.body.projectId
-			const projectId = await deleteProject(db, projectIdToDelete) 
+			const projectId = deleteProject(db, projectIdToDelete) 
 			res.status(201).json({ projectId }) 
 		} catch (error) {
 			next(error) 

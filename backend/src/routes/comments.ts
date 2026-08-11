@@ -1,42 +1,46 @@
-import { NextFunction, Request, Response, Router } from "express"
-import { getTasks, createTask, updateTask, deleteTask } from "../services/tasks"
+import { NextFunction, Request, Response, Router } from "express" 
+import { getComments, createComment, updateComment, deleteComment } from "../services/comments"
+import type { AppDB } from "../database/db"
 
-const router = Router()
+export default function createCommentsRouter(db: AppDB) {
+	const router = Router() 
 
-router.get("/tasks", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const tasks = await getTasks()
-    res.json({ tasks })
-  } catch (error) {
-    next(error)
-  }
-})
+	router.get("/comments", async (_req: Request, res: Response, next: NextFunction) => {
+		try {
+			const comments = getComments(db) 
+			res.json({ comments }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
 
-router.post("/tasks", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const task = await createTask(req.body.task)
-    res.status(201).json({ task })
-  } catch (error) {
-    next(error)
-  }
-})
+	router.post("/comments", async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const comment = createComment(db, req.body) 
+			res.status(201).json({ comment }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
 
-router.put("/tasks", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const task = await updateTask(req.body.task.taskId, req.body.task)
-    res.status(201).json({ task })
-  } catch (error) {
-    next(error)
-  }
-})
+	router.put("/comments", async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const comment = updateComment(db, req.body) 
+			res.status(201).json({ comment }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
 
-router.delete("/tasks", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const task = await deleteTask(req.body.task.taskId)
-    res.status(201).json({ task })
-  } catch (error) {
-    next(error)
-  }
-})
+	router.delete("/comments", async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const commentIdToDelete: string = req.body.commentId
+			const commentId = deleteComment(db, commentIdToDelete) 
+			res.status(201).json({ commentId }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
 
-export default router
+	return router 
+}
