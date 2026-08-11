@@ -20,10 +20,10 @@ export default function createProjectsRouter(db: AppDB) {
 		}
 	}) 
 
-	router.get("/projects/:projectId", async (req: Request, res: Response, next: NextFunction) => {
+	router.get("/projects/:projectId", async (req: Request<{ projectId: string }>, res: Response, next: NextFunction) => {
 		try {
-			const projects = getProjectDetails(db, req.params.projectId) 
-			res.json({ projects }) 
+			const project = getProjectDetails(db, req.params.projectId) 
+			res.json({ project }) 
 		} catch (error) {
 			next(error) 
 		}

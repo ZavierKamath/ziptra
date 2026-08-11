@@ -1,5 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express"
-import { getTasks, createTask, updateTask, deleteTask } from "../services/tasks"
+import {
+	getTasks,
+	getTaskDetails,
+	createTask,
+	updateTask,
+	deleteTask
+} from "../services/tasks"
 import type { AppDB } from "../database/db"
 
 export default function createTasksRouter(db: AppDB) {
@@ -13,6 +19,15 @@ export default function createTasksRouter(db: AppDB) {
 			next(error)
 		}
 	})
+
+	router.get("/tasks/:taskId", async (req: Request<{ taskId: string }>, res: Response, next: NextFunction) => {
+		try {
+			const task = getTaskDetails(db, req.params.taskId) 
+			res.json({ task }) 
+		} catch (error) {
+			next(error) 
+		}
+	}) 
 
 	router.post("/tasks", async (req: Request, res: Response, next: NextFunction) => {
 		try {
