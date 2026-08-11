@@ -35,8 +35,8 @@ export default function createTasksRouter(db: AppDB) {
 	router.delete("/tasks", async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const taskIdToDelete: string = req.body.taskId
-			const task = await deleteTask(db, taskIdToDelete)
-			res.status(201).json({ task })
+			const taskId = await deleteTask(db, taskIdToDelete)
+			res.status(201).json({ taskId })
 		} catch (error) {
 			next(error)
 		}
