@@ -20,7 +20,11 @@ export default function createProjectsRouter(db: AppDB) {
 		}
 	}) 
 
-	router.get("/projects/:projectId", async (req: Request<{ projectId: string }>, res: Response, next: NextFunction) => {
+	router.get("/projects/:projectId", async (
+		req: Request<{ projectId: string }>,
+		res: Response,
+		next: NextFunction
+	) => {
 		try {
 			const project = getProjectDetails(db, req.params.projectId) 
 			res.json({ project }) 

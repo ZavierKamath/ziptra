@@ -105,6 +105,65 @@ describe("Projects API", () => {
 		expect(getResponse2.body.projects[1].description).toBe("Test project description 2.")
 	})
 
+	it("fetches details for a single project", async () => {
+		const createProjectResponse = await request(app)
+			.post("/api/projects")
+			.send({
+				title: "Test Project Title",
+				description: "Test project description."
+			})
+
+		expect(createProjectResponse.status).toBe(201)
+		expect(createProjectResponse.body.project.title).toBe("Test Project Title")
+		expect(createProjectResponse.body.project.description).toBe("Test project description.")
+
+		const projectId = createProjectResponse.body.project.projectId
+
+		const createProjectCommentResponse = await request(app)
+			.post("/api/comments")
+			.send({
+				projectId: projectId,
+				content: "Test project comment content."
+			})
+
+
+		let taskTwoId = "garbo"
+		for (let i = 0; i < 3; i++) {
+			const createTaskResponse = await request(app)
+				.post("/api/tasks")
+				.send({
+					projectId: projectId,
+					title: "Test Task Title",
+					description: "Test task description."
+				})
+			if (i === 1) {
+				taskTwoId = createTaskResponse.body.commentId
+			}
+		}
+
+		const createTaskCommentResponse = await request(app)
+			.post("/api/comments")
+			.send({
+				projectId: taskTwoId,
+				content: "Test task comment content."
+			})
+
+		const getDetailsResponse = await request(app)
+			.get(`/api/projects/${projectId}`)
+
+		expect(getDetailsResponse.status).toBe(200)
+		expect(getDetailsResponse.body.project.project.title).toBe("Test Project Title")
+		expect(getDetailsResponse.body.project.tasks).toHaveLength(3)
+		expect(getDetailsResponse.body.project.tasks[0].title).toBe("Test Task Title")
+		expect(getDetailsResponse.body.project.tasks[0].description).toBe("Test task description.")
+		expect(getDetailsResponse.body.project.taskComments).toHaveLength(1)
+		expect(getDetailsResponse.body.project.projectComments).toHaveLength(1)
+		expect(getDetailsResponse.body.project.taskComments[0].projectId).toBe(null)
+		expect(getDetailsResponse.body.project.taskComments[0].taskId).toBe(taskTwoId)
+		expect(getDetailsResponse.body.project.taskComments[0].content).toBe("Test task comment content.")
+		expect(getDetailsResponse.body.project.projectComments[0].content).toBe("Test project comment content.")
+	})
+
 	it("updates an existing project", async () => {
 		const createResponse = await request(app)
 			.post("/api/projects")

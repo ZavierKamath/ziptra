@@ -20,7 +20,11 @@ export default function createTasksRouter(db: AppDB) {
 		}
 	})
 
-	router.get("/tasks/:taskId", async (req: Request<{ taskId: string }>, res: Response, next: NextFunction) => {
+	router.get("/tasks/:taskId", async (
+		req: Request<{ taskId: string }>,
+		res: Response,
+		next: NextFunction
+	) => {
 		try {
 			const task = getTaskDetails(db, req.params.taskId) 
 			res.json({ task }) 
