@@ -296,6 +296,30 @@ describe("Tasks API", () => {
 		expect(foundRelevantTask).toBe(true)
 	})
 
+	it("reassigns a task and makes it standalone", async () => {
+		const firstProject = await request(app).post("/api/projects").send({ title: "First" })
+		const secondProject = await request(app).post("/api/projects").send({ title: "Second" })
+		const created = await request(app).post("/api/tasks").send({
+			projectId: firstProject.body.project.projectId,
+			title: "Task",
+			description: "Description"
+		})
+
+		const reassigned = await request(app).put("/api/tasks").send({
+			taskId: created.body.task.taskId,
+			projectId: secondProject.body.project.projectId
+		})
+		expect(reassigned.body.task.projectId).toBe(secondProject.body.project.projectId)
+
+		const standalone = await request(app).put("/api/tasks").send({
+			taskId: created.body.task.taskId,
+			projectId: null,
+			description: ""
+		})
+		expect(standalone.body.task.projectId).toBe(null)
+		expect(standalone.body.task.description).toBe("")
+	})
+
 	it("deletes an existing task", async () => {
 		const createResponse = await request(app)
 			.post("/api/tasks")

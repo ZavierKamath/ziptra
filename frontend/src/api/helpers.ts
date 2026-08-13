@@ -1,72 +1,22 @@
-export async function postRequest(
-	url: string,
-	payload: any
-): Promise<any> {
-	const response = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		body: JSON.stringify(payload)
-	})
-
-	if (!response.ok) {
-		throw new Error(`POST request failed, response is ${JSON.stringify(response)}`)
-	}
-
-	const data = await response.json()
-	return data
+export async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(path, init)
+  if (!response.ok) {
+    let message = `${response.status} ${response.statusText}`
+    try {
+      const body = await response.json() as { error?: string | { message?: string }; message?: string }
+      message = typeof body.error === "string" ? body.error : body.error?.message ?? body.message ?? message
+    } catch {
+      // The backend may return an HTML error page.
+    }
+    throw new Error(message)
+  }
+  return response.json() as Promise<T>
 }
 
-export async function putRequest(
-	url: string,
-	payload: any
-): Promise<any> {
-	const response = await fetch(url, {
-		method: "PUT",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		body: JSON.stringify(payload)
-	})
-
-	if (!response.ok) {
-		throw new Error(`PUT request failed, response is ${JSON.stringify(response)}`)
-	}
-
-	const data = await response.json()
-	return data
-}
-
-export async function getRequest(
-	url: string
-): Promise<any> {
-	const response = await fetch(url)
-
-	if (!response.ok) {
-		throw new Error(`GET request failed, response is ${JSON.stringify(response)}`)
-	}
-
-	const data = await response.json()
-	return data
-}
-
-export async function deleteRequest(
-	url: string,
-	payload: any
-): Promise<any> {
-	const response = await fetch(url, {
-		method: "DELETE",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		body: JSON.stringify(payload)
-	})
-
-	if (!response.ok) {
-		throw new Error(`DELETE request failed, response is ${JSON.stringify(response)}`)
-	}
-
-	const data = await response.json()
-	return data
+export function jsonRequest<T>(path: string, method: "POST" | "PUT" | "DELETE", payload: unknown) {
+  return request<T>(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
 }

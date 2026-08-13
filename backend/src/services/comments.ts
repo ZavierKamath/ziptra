@@ -62,7 +62,7 @@ export function updateComment(db: AppDB, input: UpdateCommentInput): CommentRow 
 		projectId: input.projectId || commentRowToUpdate.projectId,
 		createdAt: commentRowToUpdate.createdAt,
 		updatedAt: nowString,
-		content: input.content || commentRowToUpdate.content
+		content: input.content ?? commentRowToUpdate.content
 	}
 
 	const updatedCommentRow: CommentRow = db.update(comments)

@@ -66,7 +66,7 @@ export function createProject(db: AppDB, input: CreateProjectInput): ProjectRow 
 	const projectRowToInsert: ProjectRow = {
 		projectId: `proj_${crypto.randomUUID()}`,
 		title: input.title,
-		description: input.description || null,
+		description: input.description ?? null,
 		createdAt: nowString,
 		updatedAt: nowString,
 		status: input.status || "New" as ProjectStatus
@@ -100,7 +100,7 @@ export function updateProject(db: AppDB, input: UpdateProjectInput): ProjectRow 
 	const projectRowToInsert: ProjectRow = {
 		projectId: projectRowToUpdate.projectId,
 		title: input.title || projectRowToUpdate.title,
-		description: input.description || projectRowToUpdate.description,
+		description: input.description ?? projectRowToUpdate.description,
 		createdAt: projectRowToUpdate.createdAt,
 		updatedAt: nowString,
 		status: input.status || projectRowToUpdate.status

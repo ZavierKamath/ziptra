@@ -1,26 +1,22 @@
-import { getRequest, postRequest, putRequest, deleteRequest } from "./helpers"
-import type { CreateProjectInput, UpdateProjectInput } from "../../../backend/src/models.ts"
+import { jsonRequest, request } from "./helpers"
+import type { CreateProjectInput, Project, ProjectDetails, UpdateProjectInput } from "../types"
 
 export async function getProjectsAPI() {
-	const projectData = await getRequest("http://localhost:3000/api/projects")
-	console.log(`GET projectData = ${JSON.stringify(projectData)}`)
-	return projectData.projects
+  return (await request<{ projects: Project[] }>("/api/projects")).projects
+}
+
+export async function getProjectAPI(projectId: string) {
+  return (await request<{ project: ProjectDetails }>(`/api/projects/${projectId}`)).project
 }
 
 export async function createProjectAPI(input: CreateProjectInput) {
-	const projectData = await postRequest("http://localhost:3000/api/projects", input)
-	console.log(`POST projectData = ${JSON.stringify(projectData)}`)
-	return projectData.project
+  return (await jsonRequest<{ project: Project }>("/api/projects", "POST", input)).project
 }
 
 export async function updateProjectAPI(input: UpdateProjectInput) {
-	const projectData = await putRequest("http://localhost:3000/api/projects", input)
-	console.log(`PUT projectData = ${JSON.stringify(projectData)}`)
-	return projectData.project
+  return (await jsonRequest<{ project: Project }>("/api/projects", "PUT", input)).project
 }
 
-export async function deleteProjectAPI(input: { projectId: string }) {
-	const projectData = await deleteRequest("http://localhost:3000/api/projects", input)
-	console.log(`DELETE projectData = ${JSON.stringify(projectData)}`)
-	return projectData
+export function deleteProjectAPI(projectId: string) {
+  return jsonRequest<{ projectId: string }>("/api/projects", "DELETE", { projectId })
 }

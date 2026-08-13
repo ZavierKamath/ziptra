@@ -25,7 +25,7 @@ export function createTask(db: AppDB, input: CreateTaskInput): TaskRow {
 		taskId: `task_${crypto.randomUUID()}`,
 		projectId: input.projectId || null,
 		title: input.title,
-		description: input.description || null,
+		description: input.description ?? null,
 		createdAt: nowString,
 		updatedAt: nowString,
 		status: input.status || "New" as TaskStatus
@@ -86,9 +86,9 @@ export function updateTask(db: AppDB, input: UpdateTaskInput): TaskRow {
 
 	const taskRowToInsert: TaskRow = {
 		taskId: taskRowToUpdate.taskId,
-		projectId: taskRowToUpdate.projectId,
+		projectId: input.projectId === undefined ? taskRowToUpdate.projectId : input.projectId,
 		title: input.title || taskRowToUpdate.title,
-		description: input.description || taskRowToUpdate.description,
+		description: input.description ?? taskRowToUpdate.description,
 		createdAt: taskRowToUpdate.createdAt,
 		updatedAt: nowString,
 		status: input.status || taskRowToUpdate.status

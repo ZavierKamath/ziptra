@@ -177,6 +177,21 @@ describe("Comments API", () => {
 		expect(getResponse2.body.comments[0].content).toBe("Updated test comment content.")
 	})
 
+	it("clears existing comment content", async () => {
+		const project = await request(app).post("/api/projects").send({ title: "Project" })
+		const created = await request(app).post("/api/comments").send({
+			projectId: project.body.project.projectId,
+			content: "Content"
+		})
+
+		const updated = await request(app).put("/api/comments").send({
+			commentId: created.body.comment.commentId,
+			content: ""
+		})
+
+		expect(updated.body.comment.content).toBe("")
+	})
+
 	it("updates one of many comments", async () => {
 		const createProjectResponse = await request(app)
 			.post("/api/projects")

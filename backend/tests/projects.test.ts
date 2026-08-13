@@ -206,6 +206,20 @@ describe("Projects API", () => {
 		expect(getResponse2.body.projects[0].status).toBe("Active")
 	})
 
+	it("clears an existing project description", async () => {
+		const created = await request(app).post("/api/projects").send({
+			title: "Project",
+			description: "Description"
+		})
+
+		const updated = await request(app).put("/api/projects").send({
+			projectId: created.body.project.projectId,
+			description: ""
+		})
+
+		expect(updated.body.project.description).toBe("")
+	})
+
 	it("updates one of many projects", async () => {
 		for (let i = 0; i < 5; i++) {
 			await request(app)
@@ -292,6 +306,34 @@ describe("Projects API", () => {
 
 		expect(getResponse2.status).toBe(200)
 		expect(getResponse2.body.projects).toHaveLength(0)
+	})
+
+	it("retains project tasks and their comments when deleting a project", async () => {
+		const project = await request(app).post("/api/projects").send({ title: "Project" })
+		const task = await request(app).post("/api/tasks").send({
+			projectId: project.body.project.projectId,
+			title: "Task"
+		})
+		const comment = await request(app).post("/api/comments").send({
+			taskId: task.body.task.taskId,
+			content: "Keep me"
+		})
+
+		await request(app).delete("/api/projects").send({
+			projectId: project.body.project.projectId
+		})
+
+		const tasksResponse = await request(app).get("/api/tasks")
+		const commentsResponse = await request(app).get("/api/comments")
+		expect(tasksResponse.body.tasks).toContainEqual(expect.objectContaining({
+			taskId: task.body.task.taskId,
+			projectId: null
+		}))
+		expect(commentsResponse.body.comments).toContainEqual(expect.objectContaining({
+			commentId: comment.body.comment.commentId,
+			taskId: task.body.task.taskId,
+			content: "Keep me"
+		}))
 	})
 
 	it("deletes one of many projects", async () => {
