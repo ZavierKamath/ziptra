@@ -137,14 +137,14 @@ describe("Projects API", () => {
 					description: "Test task description."
 				})
 			if (i === 1) {
-				taskTwoId = createTaskResponse.body.commentId
+				taskTwoId = createTaskResponse.body.task.taskId
 			}
 		}
 
 		const createTaskCommentResponse = await request(app)
 			.post("/api/comments")
 			.send({
-				projectId: taskTwoId,
+				taskId: taskTwoId,
 				content: "Test task comment content."
 			})
 
@@ -156,8 +156,8 @@ describe("Projects API", () => {
 		expect(getDetailsResponse.body.project.tasks).toHaveLength(3)
 		expect(getDetailsResponse.body.project.tasks[0].title).toBe("Test Task Title")
 		expect(getDetailsResponse.body.project.tasks[0].description).toBe("Test task description.")
-		expect(getDetailsResponse.body.project.taskComments).toHaveLength(1)
 		expect(getDetailsResponse.body.project.projectComments).toHaveLength(1)
+		expect(getDetailsResponse.body.project.taskComments).toHaveLength(1)
 		expect(getDetailsResponse.body.project.taskComments[0].projectId).toBe(null)
 		expect(getDetailsResponse.body.project.taskComments[0].taskId).toBe(taskTwoId)
 		expect(getDetailsResponse.body.project.taskComments[0].content).toBe("Test task comment content.")
