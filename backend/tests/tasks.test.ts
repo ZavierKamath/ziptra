@@ -166,6 +166,40 @@ describe("Tasks API", () => {
 		expect(getResponse2.body.tasks[1].description).toBe("Test task description 2.")
 	})
 
+	it("fetches details for a single task", async () => {
+		const createTaskResponse = await request(app)
+			.post("/api/tasks")
+			.send({
+				title: "Test Task Title",
+				description: "Test task description."
+			})
+
+		expect(createTaskResponse.status).toBe(201)
+		expect(createTaskResponse.body.task.title).toBe("Test Task Title")
+		expect(createTaskResponse.body.task.description).toBe("Test task description.")
+
+		const taskId = createTaskResponse.body.task.taskId
+
+		const createTaskCommentResponse = await request(app)
+			.post("/api/comments")
+			.send({
+				taskId: taskId,
+				content: "Test task comment content."
+			})
+
+		const getDetailsResponse = await request(app)
+			.get(`/api/tasks/${taskId}`)
+
+		expect(getDetailsResponse.status).toBe(200)
+		expect(getDetailsResponse.body.task.task.title).toBe("Test Task Title")
+		expect(getDetailsResponse.body.task.task.description).toBe("Test task description.")
+		expect(getDetailsResponse.body.task.comments).toHaveLength(1)
+		expect(getDetailsResponse.body.task.comments[0].content).toBe("Test task comment content.")
+		expect(getDetailsResponse.body.task.comments[0].commentId).toBe(createTaskCommentResponse.body.comment.commentId)
+		expect(getDetailsResponse.body.task.comments[0].taskId).toBe(taskId)
+		expect(getDetailsResponse.body.task.comments[0].projectId).toBe(null)
+	})
+
 	it("updates an existing task", async () => {
 		const createResponse = await request(app)
 			.post("/api/tasks")
