@@ -8,14 +8,17 @@ import type {
 } from "../models.ts"
 import { comments, tasks } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
-import { eq } from "drizzle-orm"
+import { eq, gte, ne, or } from "drizzle-orm"
 
-export function getTasks(db: AppDB): TaskRow[] {
-	const foundTasks: TaskRow[] = db.select()
-		.from(tasks)
-		.all()
+export function getTasks(db: AppDB, closedSince?: string): TaskRow[] {
+	if (closedSince) {
+		return db.select()
+			.from(tasks)
+			.where(or(ne(tasks.status, "Closed"), gte(tasks.updatedAt, closedSince)))
+			.all()
+	}
 
-	return foundTasks
+	return db.select().from(tasks).all()
 }
 
 export function createTask(db: AppDB, input: CreateTaskInput): TaskRow {

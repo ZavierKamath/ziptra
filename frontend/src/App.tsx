@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Header from "./components/Header"
 import FilterBar from "./components/FilterBar"
 import Board from "./components/Board"
@@ -16,6 +16,16 @@ function initialSelection(): Selection | null {
   return match ? { type: match[1] as "project" | "task", id: match[2] } : null
 }
 
+function selectionKey(selection: Selection) {
+  return `${selection.type}:${selection.id}`
+}
+
+function closedSinceCutoff() {
+  const cutoff = new Date()
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - 4)
+  return cutoff.toISOString()
+}
+
 export default function App() {
   const [mode, setMode] = useState<BoardMode>("projects")
   const [projects, setProjects] = useState<Project[]>([])
@@ -29,10 +39,13 @@ export default function App() {
   const [details, setDetails] = useState<ProjectDetails | TaskDetails | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
   const [detailError, setDetailError] = useState("")
+  const detailsCache = useRef(new Map<string, ProjectDetails | TaskDetails>())
+  const detailRequestId = useRef(0)
 
   const loadBoard = useCallback(async () => {
     try {
-      const [nextProjects, nextTasks] = await Promise.all([getProjectsAPI(), getTasksAPI()])
+      const cutoff = closedSinceCutoff()
+      const [nextProjects, nextTasks] = await Promise.all([getProjectsAPI(cutoff), getTasksAPI(cutoff)])
       setProjects(nextProjects)
       setTasks(nextTasks)
       setNotice("")
@@ -41,15 +54,30 @@ export default function App() {
     } finally { setLoading(false) }
   }, [])
 
-  const loadDetails = useCallback(async (selected: Selection) => {
+  const loadDetails = useCallback(async (selected: Selection, force = false) => {
+    const requestId = ++detailRequestId.current
+    const key = selectionKey(selected)
+    const cached = detailsCache.current.get(key)
+    if (cached && !force) {
+      setDetailLoading(false)
+      setDetailError("")
+      setDetails(cached)
+      return
+    }
+
     setDetailLoading(true)
     setDetailError("")
     try {
-      setDetails(selected.type === "project" ? await getProjectAPI(selected.id) : await getTaskAPI(selected.id))
+      const loaded = selected.type === "project" ? await getProjectAPI(selected.id) : await getTaskAPI(selected.id)
+      detailsCache.current.set(key, loaded)
+      if (requestId === detailRequestId.current) setDetails(loaded)
     } catch (cause) {
-      setDetailError(cause instanceof Error ? cause.message : "Could not load details")
-      setDetails(null)
-    } finally { setDetailLoading(false) }
+      if (requestId === detailRequestId.current) {
+        setDetailError(cause instanceof Error ? cause.message : "Could not load details")
+      }
+    } finally {
+      if (requestId === detailRequestId.current) setDetailLoading(false)
+    }
   }, [])
 
   useEffect(() => { void loadBoard() }, [loadBoard])
@@ -58,6 +86,8 @@ export default function App() {
       window.history.replaceState(null, "", `#${selection.type}=${selection.id}`)
       void loadDetails(selection)
     } else {
+      detailRequestId.current++
+      setDetailLoading(false)
       setDetails(null)
       window.history.replaceState(null, "", window.location.pathname + window.location.search)
     }
@@ -76,7 +106,12 @@ export default function App() {
 
   function openEntity(item: Project | Task) {
     const isTask = "taskId" in item
-    setSelection({ type: isTask ? "task" : "project", id: isTask ? item.taskId : item.projectId })
+    const nextSelection: Selection = { type: isTask ? "task" : "project", id: isTask ? item.taskId : item.projectId }
+    const cached = detailsCache.current.get(selectionKey(nextSelection))
+    setDetails(cached ?? (isTask
+      ? { task: item as Task, comments: [] }
+      : { project: item as Project, projectComments: [], tasks: tasks.filter((task) => task.projectId === item.projectId), taskComments: [] }))
+    setSelection(nextSelection)
   }
 
   async function saveEntity(values: { title: string; description: string; status: string; projectId?: string | null }) {
@@ -92,7 +127,7 @@ export default function App() {
       else await createTaskAPI(input)
     }
     await loadBoard()
-    if (selection) await loadDetails(selection)
+    if (selection) await loadDetails(selection, true)
   }
 
   async function moveEntity(item: Project | Task, status: string) {
@@ -116,7 +151,7 @@ export default function App() {
 
   async function mutateComment(action: () => Promise<unknown>) {
     await action()
-    if (selection) await loadDetails(selection)
+    if (selection) await loadDetails(selection, true)
   }
 
   const selectedType = selection?.type ?? "project"

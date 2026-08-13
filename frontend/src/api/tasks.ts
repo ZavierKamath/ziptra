@@ -1,8 +1,9 @@
 import { jsonRequest, request } from "./helpers"
 import type { CreateTaskInput, Task, TaskDetails, UpdateTaskInput } from "../types"
 
-export async function getTasksAPI() {
-  return (await request<{ tasks: Task[] }>("/api/tasks")).tasks
+export async function getTasksAPI(closedSince?: string) {
+  const query = closedSince ? `?closedSince=${encodeURIComponent(closedSince)}` : ""
+  return (await request<{ tasks: Task[] }>(`/api/tasks${query}`)).tasks
 }
 
 export async function getTaskAPI(taskId: string) {

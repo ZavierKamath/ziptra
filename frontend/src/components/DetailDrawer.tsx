@@ -28,10 +28,11 @@ export default function DetailDrawer(props: Props) {
 
   return (
     <div className="drawer-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
-      <aside className="drawer">
+      <aside className="drawer" role="dialog" aria-modal="true" aria-label={`${type} details`}>
         <button className="drawer-close" onClick={onClose} aria-label="Close details">×</button>
-        {loading && <div className="drawer-state">Loading...</div>}
-        {error && <div className="drawer-state error">{error}</div>}
+        {loading && !entity && <div className="drawer-state">Loading...</div>}
+        {loading && entity && <div className="detail-sync">Loading details...</div>}
+        {error && <div className="detail-error">{error}</div>}
         {entity && (
           <>
             <header className="detail-header">

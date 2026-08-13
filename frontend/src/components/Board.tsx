@@ -44,7 +44,6 @@ export default function Board({ mode, items, statuses, projects, onOpen, onMove 
                     event.dataTransfer.setData("text/plain", id)
                     event.dataTransfer.effectAllowed = "move"
                   }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") onOpen(item) }} onClick={() => onOpen(item)}>
-                    <div className="card-id">{id}</div>
                     <h2>{item.title}</h2>
                     {plainPreview(item.description) && <p>{plainPreview(item.description)}</p>}
                     {!isProject && <div className="card-project">{taskProjectId ? projectNames.get(taskProjectId) ?? "Unknown project" : "Standalone"}</div>}

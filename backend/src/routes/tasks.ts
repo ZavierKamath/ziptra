@@ -11,9 +11,10 @@ import type { AppDB } from "../database/db"
 export default function createTasksRouter(db: AppDB) {
 	const router = Router()
 
-	router.get("/tasks", async (_req: Request, res: Response, next: NextFunction) => {
+	router.get("/tasks", async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const tasks = getTasks(db)
+			const closedSince = typeof req.query.closedSince === "string" ? req.query.closedSince : undefined
+			const tasks = getTasks(db, closedSince)
 			res.json({ tasks })
 		} catch (error) {
 			next(error)

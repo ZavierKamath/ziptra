@@ -4,6 +4,7 @@ import { migrate } from "drizzle-orm/better-sqlite3/migrator"
 import { createDb } from "../src/database/db"
 import { createApp } from "../src/app"
 import { comments, projects, tasks } from "../src/database/schema"
+import { eq } from "drizzle-orm"
 
 const db = createDb(":memory:")
 
@@ -103,6 +104,25 @@ describe("Projects API", () => {
 		expect(getResponse2.body.projects[1].title).toBe("Test Project Title 2")
 		expect(getResponse2.body.projects[0].description).toBe("Test project description.")
 		expect(getResponse2.body.projects[1].description).toBe("Test project description 2.")
+	})
+
+	it("excludes only closed projects older than the requested cutoff", async () => {
+		const oldClosed = await request(app).post("/api/projects").send({ title: "Old closed", status: "Closed" })
+		const recentClosed = await request(app).post("/api/projects").send({ title: "Recent closed", status: "Closed" })
+		const oldActive = await request(app).post("/api/projects").send({ title: "Old active", status: "Active" })
+		const oldDate = "2025-01-01T00:00:00.000Z"
+
+		for (const projectId of [oldClosed.body.project.projectId, oldActive.body.project.projectId]) {
+			db.update(projects).set({ updatedAt: oldDate }).where(eq(projects.projectId, projectId)).run()
+		}
+
+		const response = await request(app).get("/api/projects?closedSince=2025-06-01T00:00:00.000Z")
+
+		expect(response.status).toBe(200)
+		expect(response.body.projects.map((project: { title: string }) => project.title)).toEqual([
+			"Recent closed",
+			"Old active"
+		])
 	})
 
 	it("fetches details for a single project", async () => {

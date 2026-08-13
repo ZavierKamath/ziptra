@@ -9,14 +9,17 @@ import type {
 } from "../models.ts"
 import { comments, tasks, projects } from "../database/schema.ts"
 import { AppDB } from "../database/db.ts"
-import { eq, inArray } from "drizzle-orm"
+import { eq, gte, inArray, ne, or } from "drizzle-orm"
 
-export function getProjects(db: AppDB): ProjectRow[] {
-	const foundProjects: ProjectRow[] = db.select()
-		.from(projects)
-		.all()
+export function getProjects(db: AppDB, closedSince?: string): ProjectRow[] {
+	if (closedSince) {
+		return db.select()
+			.from(projects)
+			.where(or(ne(projects.status, "Closed"), gte(projects.updatedAt, closedSince)))
+			.all()
+	}
 
-	return foundProjects
+	return db.select().from(projects).all()
 }
 
 export function getProjectDetails(db: AppDB, projectId: string): ProjectDetails {

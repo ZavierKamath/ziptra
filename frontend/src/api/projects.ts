@@ -1,8 +1,9 @@
 import { jsonRequest, request } from "./helpers"
 import type { CreateProjectInput, Project, ProjectDetails, UpdateProjectInput } from "../types"
 
-export async function getProjectsAPI() {
-  return (await request<{ projects: Project[] }>("/api/projects")).projects
+export async function getProjectsAPI(closedSince?: string) {
+  const query = closedSince ? `?closedSince=${encodeURIComponent(closedSince)}` : ""
+  return (await request<{ projects: Project[] }>(`/api/projects${query}`)).projects
 }
 
 export async function getProjectAPI(projectId: string) {
